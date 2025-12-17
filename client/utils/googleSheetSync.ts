@@ -103,7 +103,7 @@ export const sendToGoogleSheet = async (
       whatsappConfig: whatsappConfig
     };
 
-    const response = await fetch(url, {
+    await fetch(url, {
       method: "POST",
       mode: "no-cors",
       headers: {
@@ -111,23 +111,9 @@ export const sendToGoogleSheet = async (
       },
       body: JSON.stringify(payload),
     });
-    
     return true;
   } catch (error) {
     console.error("Google Sheet Sync Failed:", error);
-    return false;
-  }
-};
-
-export const clearSyncedRecords = (invoiceNumbers: string[]) => {
-  const SALES_HISTORY_KEY = 'billkaro_sales_history_v1';
-  try {
-    const existingHistory = JSON.parse(window.localStorage.getItem(SALES_HISTORY_KEY) || '[]');
-    const filteredHistory = existingHistory.filter((record: SalesRecord) => !invoiceNumbers.includes(record.invoiceNumber));
-    window.localStorage.setItem(SALES_HISTORY_KEY, JSON.stringify(filteredHistory));
-    return true;
-  } catch (error) {
-    console.error("Failed to clear synced records:", error);
     return false;
   }
 };
