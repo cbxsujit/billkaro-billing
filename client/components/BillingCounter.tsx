@@ -6,7 +6,7 @@ import { InvoiceItemsTable } from './InvoiceItemsTable';
 import { BillSummary } from './BillSummary';
 import { CustomerDetails, InvoiceItem, InvoiceData, Product, SalesRecord, EmailConfig, WhatsAppConfig } from '../types';
 import { generateInvoicePDF } from '../utils/pdfGenerator';
-import { sendToGoogleSheet } from '../utils/googleSheetSync';
+import { sendToGoogleSheet, clearSyncedRecords } from '../utils/googleSheetSync';
 
 const STORAGE_KEY = 'billkaro_draft_v1';
 const PRODUCT_STORAGE_KEY = 'billkaro_products_v1';
@@ -186,8 +186,11 @@ export const BillingCounter: React.FC = () => {
                      };
                  }
 
-                 sendToGoogleSheet(sheetUrl, [newRecord], emailConfig, whatsappConfig);
-                 console.log("Cloud sync initiated.");
+                 const syncSuccess = await sendToGoogleSheet(sheetUrl, [newRecord], emailConfig, whatsappConfig);
+                 if (syncSuccess) {
+                     clearSyncedRecords([invoiceNumber]);
+                     console.log("Cloud sync completed. Record removed from local storage.");
+                 }
              }
           }
       } catch (e) {
