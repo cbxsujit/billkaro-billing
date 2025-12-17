@@ -161,11 +161,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       }
 
       setIsSyncing(true);
-      await sendToGoogleSheet(sheetUrl, salesHistory);
-      setTimeout(() => {
+      const syncSuccess = await sendToGoogleSheet(sheetUrl, salesHistory);
+      
+      if (syncSuccess) {
+          // Clear synced records from local storage
+          localStorage.removeItem(SALES_HISTORY_KEY);
+          setSalesHistory([]);
+          
+          setTimeout(() => {
+              setIsSyncing(false);
+              alert("Sync completed! Records sent to Google Sheets and removed from page.");
+          }, 1000);
+      } else {
           setIsSyncing(false);
-          alert("Sync request sent to Google Sheets!");
-      }, 1000);
+          alert("Sync failed. Please try again.");
+      }
   };
 
   // --- Data Management Handlers ---
